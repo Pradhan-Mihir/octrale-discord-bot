@@ -2,12 +2,11 @@ from multipledispatch import dispatch
 
 
 class Error:
-    filepath = ""
+    filepath = "Error.log"
     message = ""
 
     def __init__(self):
         self.file = None
-        self.filepath = "Error.log"
 
     @dispatch(str)
     def log(self, text: str):
@@ -34,6 +33,22 @@ class Error:
 
     @dispatch(Exception, str)
     def log(self, e: Exception, text: str):
+        try:
+            file = open(self.filepath, "a")
+            file.write("+++++++++++Error Start+++++++++++\n")
+            self.message = "Message: " + text + "\n"
+            file.write(self.message)
+            file.write(e.__str__())
+            file.write("\n")
+            file.write("+++++++++++Error End+++++++++++\n")
+        except Exception as e:
+            print(e)
+        finally:
+            if self.file is not None:
+                self.file.close()
+
+    @dispatch(str, Exception)
+    def log(self, text: str, e: str):
         try:
             file = open(self.filepath, "a")
             file.write("+++++++++++Error Start+++++++++++\n")
